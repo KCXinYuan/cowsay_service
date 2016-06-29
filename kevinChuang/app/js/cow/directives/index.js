@@ -1,3 +1,3 @@
 module.exports = function(app) {
-  require('./cowsay_service')(app);
+  require('./cow_directive')(app);
 };
