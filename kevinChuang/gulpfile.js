@@ -1,20 +1,32 @@
 const gulp = require('gulp');
-const eslint = require('gulp-eslint');
-const mocha = require('gulp-mocha');
+const del = require('del');
+const webpack = require('webpack-stream');
 
-gulp.task('default', ['lint', 'test'], () => {
-  console.log('started');
+const paths = {
+  html: './app/**/*.html',
+  js: './app/js/client.js',
+  tests: './test/controller_test.js'
+};
+
+gulp.task('bundle', ['clean'], () => {
+  return gulp.src(paths.js)
+    .pipe(webpack({output:{filename: 'bundle.js'}}))
+    .pipe(gulp.dest('build'));
 });
 
-gulp.task('lint', () => {
-  gulp.src('/server.js')
-  .pipe(eslint())
-  .pipe(eslint.format());
+gulp.task('clean', () => {
+  return del('./build/**/*');
 });
 
-gulp.task('test', () => {
-  gulp.src('test/*test.js')
-  .pipe(mocha());
+gulp.task('copy', ['clean'],() => {
+  return gulp.src(paths.html)
+    .pipe(gulp.dest('./build'));
 });
 
-gulp.watch('./**/*.js', ['lint', 'test']);
+gulp.task('bundle:test', () => {
+  return gulp.src(paths.tests)
+    .pipe(webpack({output:{filename: 'test_bundle.js'}}))
+    .pipe(gulp.dest('./test'));
+});
+
+gulp.task('default', ['bundle', 'clean', 'copy']);
